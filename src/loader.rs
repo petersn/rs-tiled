@@ -169,7 +169,7 @@ impl<Cache: ResourceCache> Loader<Cache> {
     /// const PATH: &str = "assets/tilesheet.tsx";
     /// const CONTENTS: &[u8] = include_bytes!(PATH);
     /// let mut loader = Loader::new();
-    /// loader.populate_tsx_cache_tileset_from(&CONTENTS[..], PATH).unwrap();
+    /// loader.populate_tsx_cache_from(&CONTENTS[..], PATH).unwrap();
     /// // You are now free to use `load_tmx_map_from` on TMX files that reference this tileset
     /// // without causing a crash in WASM builds.
     /// ```
