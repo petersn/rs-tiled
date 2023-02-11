@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path};
+use std::{fs::File, io::Read, path::Path, sync::Arc};
 
 use crate::{Error, FilesystemResourceCache, Map, ResourceCache, Result, Tileset};
 
