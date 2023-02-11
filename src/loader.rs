@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path};
+use std::{fs::File, io::Read, path::Path, sync::Arc};
 
 use crate::{Error, FilesystemResourceCache, Map, ResourceCache, Result, Tileset};
 
@@ -151,12 +151,13 @@ impl<Cache: ResourceCache> Loader<Cache> {
     /// assert_eq!(tileset.image.unwrap().source, PathBuf::from("assets/tilesheet.png"));
     /// ```
     pub fn load_tsx_tileset_from(
-        &self,
+        &mut self,
         reader: impl Read,
         path: impl AsRef<Path>,
-    ) -> Result<Tileset> {
-        // This function doesn't need the cache right now, but will do once template support is in
-        crate::parse::xml::parse_tileset(reader, path.as_ref())
+    ) -> Result<Arc<Tileset>> {
+        self.cache.get_or_try_insert_tileset_with(path.as_ref().to_owned(), || {
+            crate::parse::xml::parse_tileset(reader, path.as_ref())
+        })
     }
 
     /// Returns a reference to the loader's internal [`ResourceCache`].
