@@ -1,4 +1,4 @@
-use std::{fs::File, io::Read, path::Path, sync::Arc};
+use std::{fs::File, io::Read, path::Path};
 
 use crate::{Error, FilesystemResourceCache, Map, ResourceCache, Result, Tileset};
 
@@ -151,6 +151,29 @@ impl<Cache: ResourceCache> Loader<Cache> {
     /// assert_eq!(tileset.image.unwrap().source, PathBuf::from("assets/tilesheet.png"));
     /// ```
     pub fn load_tsx_tileset_from(
+        &self,
+        reader: impl Read,
+        path: impl AsRef<Path>,
+    ) -> Result<Tileset> {
+        // This function doesn't need the cache right now, but will do once template support is in
+        crate::parse::xml::parse_tileset(reader, path.as_ref())
+    }
+
+    /// In WASM builds you must preload all required TSX files before loading a TMX file, because
+    /// the filesystem is not available. You can use this function to populate the cache.
+    ///
+    /// ## Example
+    /// ```
+    /// use tiled::Loader;
+    ///
+    /// const PATH: &str = "assets/tilesheet.tsx";
+    /// const CONTENTS: &[u8] = include_bytes!(PATH);
+    /// let mut loader = Loader::new();
+    /// loader.populate_tsx_cache_tileset_from(&CONTENTS[..], PATH).unwrap();
+    /// // You are now free to use `load_tmx_map_from` on TMX files that reference this tileset
+    /// // without causing a crash in WASM builds.
+    /// ```
+    pub fn populate_tsx_cache_from(
         &mut self,
         reader: impl Read,
         path: impl AsRef<Path>,
